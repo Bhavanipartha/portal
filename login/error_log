@@ -1,0 +1,22 @@
+[10-Sep-2023 13:09:21 UTC] PHP Notice:  Undefined index: username in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[10-Sep-2023 13:09:21 UTC] PHP Notice:  Undefined index: password in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[22-Sep-2023 04:58:03 UTC] PHP Notice:  Undefined index: username in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[22-Sep-2023 04:58:03 UTC] PHP Notice:  Undefined index: password in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[01-Nov-2023 14:22:43 UTC] PHP Notice:  Undefined index: username in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[01-Nov-2023 14:22:43 UTC] PHP Notice:  Undefined index: password in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[09-Nov-2023 17:25:20 UTC] PHP Notice:  Undefined index: username in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[09-Nov-2023 17:25:20 UTC] PHP Notice:  Undefined index: password in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[11-Jan-2024 06:45:34 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[11-Jan-2024 06:45:34 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[11-Jan-2024 06:46:44 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[11-Jan-2024 06:46:44 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[12-Sep-2024 07:20:17 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[12-Sep-2024 07:20:17 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[02-Dec-2024 10:58:24 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[02-Dec-2024 10:58:24 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[28-Feb-2025 08:33:58 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[28-Feb-2025 08:33:58 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[18-Jun-2025 06:37:34 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[18-Jun-2025 06:37:34 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
+[18-Jun-2025 06:38:23 UTC] PHP Warning:  Undefined array key "username" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 5
+[18-Jun-2025 06:38:23 UTC] PHP Warning:  Undefined array key "password" in /home/l8qqvr0zntd5/public_html/portal/login/login.php on line 6
