@@ -1,0 +1,63 @@
+
+
+  
+  .card {
+    background: hwb(227 96% 0%);
+    border-radius: 30px;
+    height: 45vh;
+    width: 40vw;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    overflow: hidden;
+    color:#ed11c8;
+  }
+  
+  @media only screen and (min-width: 400px) {
+    .card {
+      flex-direction: row-reverse;
+    }
+    .card img.birthday {
+      width: 40%;
+      max-width: 50vw;
+      max-height: unset;
+      border-radius: 30px;
+    }
+  }
+  
+  @media only screen and (max-height: 440px) {
+    .card {
+      flex-direction: row-reverse;
+    }
+    .card img.birthday {
+      width: 70%;
+      max-width: 50vw;
+      max-height: unset;
+    }
+  }
+  
+  img.birthday {
+    max-height: 40vh;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
+  
+  .text {
+    padding: 2em;
+  }
+  .text h1{
+    font-family:cursive;
+    font-size: 20px;
+  }
+
+
+  
+  .credit {
+      margin-top: 10px;
+      text-align: center;
+  }
+  
+  
