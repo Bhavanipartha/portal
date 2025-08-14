@@ -39,7 +39,8 @@ if (!empty($_SESSION['uname'])){
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
   
- 
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
   <!-- Custom fonts for this template-->
   <link href="./assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -656,7 +657,8 @@ if (!empty($_SESSION['uname'])){
                                         <th>
                                             Status
                                         </th>
-                                        
+                                        <th>Actions</th>
+
                                         
                                        
                                         
@@ -706,22 +708,27 @@ if (isset($_SESSION['uname']) && !empty($_SESSION['uname'])) {
 
                 while ($row = $result->fetch_assoc()) {
                     $output .= '<tr>
-                        <td>' . $i . '</td>
-                        <td>' . $row['prj_name'] . ' </td>
-                        <td>' . date('d-m-Y', strtotime($row['s_date'])) . '</td>
-                        <td>' .  date('d-m-Y', strtotime($row['e_date'])). '</td>
-                        <td>' . $row['name'] . '</td>
-                      
-                        <td style="white-space: nowrap">';
-                    if ($row['approved_status'] == 0) {
-                        $output .= '<span class="badge badge-warning">In Progress</span>';
-                    } else if ($row['approved_status'] == 2) {
-                        $output .= '<span class="badge badge-danger">Deadline Exceeded</span>';
-                    } else {
-                        $output .= '<span class="badge badge-success">Completed</span>';
-                    }
-                    $output .= '</td>
-                    </tr>';
+    <td>' . $i . '</td>
+    <td>' . $row['prj_name'] . '</td>
+    <td>' . date('d-m-Y', strtotime($row['s_date'])) . '</td>
+    <td>' . date('d-m-Y', strtotime($row['e_date'])) . '</td>
+    <td>' . $row['name'] . '</td>
+    <td>';
+if ($row['approved_status'] == 0) {
+    $output .= '<span class="badge badge-warning">In Progress</span>';
+} elseif ($row['approved_status'] == 2) {
+    $output .= '<span class="badge badge-danger">Deadline Exceeded</span>';
+} else {
+    $output .= '<span class="badge badge-success">Completed</span>';
+}
+$output .= '<td style="white-space: nowrap;">
+
+    <i class="bi bi-pencil mr-4" style="cursor: pointer;" onclick="editProject(' . $row['p_id'] . ')"></i>
+    <i class="bi bi-trash mr-4" style="cursor: pointer;" onclick="deleteProject(' . $row['p_id'] . ')"></i>
+</td></tr>';
+
+
+
 
                     $i++;
                 }
@@ -784,6 +791,9 @@ if (isset($_SESSION['uname']) && !empty($_SESSION['uname'])) {
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
 <script src="./assets/js/ajax.js"></script>
+
+
+
 
 <!-- Bootstrap core JavaScript-->
 <script src="./assets/vendor/jquery/jquery.min.js"></script>

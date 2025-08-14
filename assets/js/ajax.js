@@ -1,4 +1,120 @@
 
+/* ----------------- PROJECT FUNCTIONS ------------------ */
+
+// Show Project
+function editProject(p_id) {
+  console.log("🛠 editProject() called with p_id:", p_id);
+
+  $.ajax({
+    type: "POST",
+    url: "showProject.php",
+    data: { p_id },
+    dataType: "json",
+    beforeSend: function () {
+      console.log("📤 Sending request to showProject.php with data:", { p_id });
+    },
+    success: function (data) {
+      console.log("✅ AJAX success. Raw data received:", data);
+
+      if (!data || !data.p_id) {
+        console.error("❌ No record found / invalid JSON:", data);
+        return;
+      }
+
+      $('#edit_prj_name').val(data.prj_name);
+      $('#edit_s_date').val(data.s_date);
+      $('#edit_e_date').val(data.e_date);
+      $('#edit_name').val(data.name);
+      $('#edit_p_id').val(data.p_id);
+
+      const el = document.getElementById('modalForEditProject');
+    var myModal = new bootstrap.Modal(document.getElementById('modalForEditProject'));
+myModal.show();
+
+    },
+    error: function (xhr) {
+      console.error("🚨 AJAX error:", xhr.status, xhr.responseText);
+    }
+  });
+}
+
+// Edit Project Submit
+// Edit Project Submit
+$("#editProjectFrm").submit(function(e) {
+  e.preventDefault();
+
+  // Copy the value of disabled select to hidden input
+  $('#edit_prj_name_hidden').val($('#edit_prj_name').val());
+
+  let fd = new FormData(this);
+
+  $.ajax({
+    url: "editProject.php",
+    method: "POST",
+    data: fd,
+    processData: false,
+    contentType: false,
+    dataType: "json",
+    success: function (data) {
+      console.log("✅ Parsed JSON:", data);
+      if (data == 1) {
+        Swal.fire({
+          icon: "success",
+          text: "Project updated successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setTimeout(() => location.reload(), 1000);
+      } else if (data == 2) {
+        Swal.fire({ icon: "error", text: "Duplicate end date found!" });
+      } else {
+        Swal.fire({ icon: "error", text: "Update failed!" });
+      }
+    },
+    error: function (xhr) {
+      console.error("❌ Response text:", xhr.responseText);
+    }
+  });
+});
+
+
+// Delete Project
+function deleteProject(p_id) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This will permanently delete the project!",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "deleteProject.php",
+        method: "POST",
+        data: { p_id },
+        success: function(data) {
+          if (data == 1) {
+            Swal.fire({
+              icon: "success",
+              text: "Project deleted...",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            Swal.fire({ icon: "error", text: 'Try again later...' });
+          }
+        },
+        error: function(exception) {
+          console.log('Error:', exception);
+        }
+      });
+    }
+  });
+}
+
+
+
 //ApproveRequest
 function approveRequest() {   
     cid=arguments[0];
@@ -208,66 +324,6 @@ function rejectRequest() {
 }
 
 
-// ShowProject
-function editProject(){
-    var id=arguments[0];
-    // alert(id);
-    $.ajax({
-        method: "POST",        
-        url: "showProject.php",
-        data: {p_id:id}, // serializes the form's elements.        
-        success: function(result){
-            var data = jQuery.parseJSON(result);            
-            $('#modalForEditProject').modal('show');
-            $('#edit_date1').val(data.date1);                           
-            $('#edit_p_id').val(id);                                    
-        }
-    });
-}
-
-
-//EditProject
-$("#editProjectFrm").submit(function(e) {
-    e.preventDefault(); // avoid to execute the actual submit of the form.
-    // alert("1");
-    let myform = document.getElementById("editProjectFrm");
-    let fd = new FormData(myform );
-    $.ajax({
-        method: "POST",
-        dataType:"json",
-        url: "editProject.php",
-        data: fd, // serializes the form's elements.
-        processData: false,
-        contentType: false,
-        success: function(data)
-        {
-            if(data == 1){
-                Swal.fire({
-                    icon: "success",
-                    text: "Project updated...",
-                    type: "success",
-                    timer: 2000,
-                    showConfirmButton: false
-                  })                
-                setTimeout(function(){ location.reload(); },1000);	 
-            }
-            else if(data == 2){                
-                Swal.fire({
-                    type: "Error!",
-                text:'Redundant...',
-                icon:'error'
-                })
-            }
-            else{
-                Swal.fire({
-                    type: "Error!",
-                text:'Try again later...',
-                icon:'error'
-                })
-            }
-        }
-    });   
-});
 
 
 // ShowPayslip

@@ -16,7 +16,7 @@ if (!empty($_SESSION['uname'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Manage Allocation</title>
+  <title>Manage User</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -81,27 +81,34 @@ if (!empty($_SESSION['uname'])) {
       /* Toggle Sidebar Button */
       /* Search Bar */
     }
+
     /* styles.css */
-.separator {
-  border: none;
-  border-top: 1px solid white; /* Adjust color and thickness as needed */
-  margin: 10px 0; /* Add margin for spacing */
-}
+    .separator {
+      border: none;
+      border-top: 1px solid white;
+      /* Adjust color and thickness as needed */
+      margin: 10px 0;
+      /* Add margin for spacing */
+    }
 
-.separator-text {
-  display: block;
-  text-align: center; /* Align text in the center */
-  margin-top: -10px; /* Adjust spacing as needed */
-  background-color: white; /* Background color for the text */
-  width: fit-content; /* Adjust width as needed */
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 10px; /* Adjust padding as needed */
+    .separator-text {
+      display: block;
+      text-align: center;
+      /* Align text in the center */
+      margin-top: -10px;
+      /* Adjust spacing as needed */
+      background-color: white;
+      /* Background color for the text */
+      width: fit-content;
+      /* Adjust width as needed */
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 10px;
+      /* Adjust padding as needed */
 
-  background-color:#ADD8E6  ;
-  
-}
+      background-color: #ADD8E6;
 
+    }
   </style>
 </head>
 
@@ -125,7 +132,7 @@ if (!empty($_SESSION['uname'])) {
 
       <div class="d-flex align-items-center justify-content-between">
         <a href="./dashboard.php" class="logo d-flex align-items-center">
-               <img src="./assets/img/genAI-logo.png" alt="" width="55" height="55">
+          <img src="./assets/img/genAI-logo.png" alt="" width="55" height="55">
 
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -212,12 +219,12 @@ if (!empty($_SESSION['uname'])) {
 
           </ul>
         </li>
-          <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link collapsed" href="addQuote.php">
             <i class="bi bi-plus-circle"></i>
             <span>Add Quote</span></a>
         </li>
-          <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link collapsed" href="bestPerformer.php">
             <i class="bi bi-trophy-fill"></i>
             <span>Best Performer</span>
@@ -247,7 +254,7 @@ if (!empty($_SESSION['uname'])) {
               <a href="attendanceReport.php">
                 <i class="bi bi-circle"></i><span>Attendance Report</span>
               </a>
-               <a href="timesheetReport.php">
+              <a href="timesheetReport.php">
                 <i class="bi bi-circle"></i><span>Timesheet Report</span>
               </a>
               <a href="salaryReport.php">
@@ -257,10 +264,10 @@ if (!empty($_SESSION['uname'])) {
             </li>
           </ul>
         </li>
-<?php
-     }else if ($_SESSION['role'] == 'S-admin') {
+      <?php
+      } else if ($_SESSION['role'] == 'S-admin') {
       ?>
-      
+
         <li class="nav-item">
           <a class="nav-link " data-bs-target="#user-nav" data-bs-toggle="collapse" href="#students-nav">
             <i class=" bi bi-person-fill"></i> <span>User</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -280,7 +287,7 @@ if (!empty($_SESSION['uname'])) {
 
           </ul>
         </li>
-         <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link collapsed" href="addQuote.php">
             <i class="bi bi-plus-circle"></i>
             <span>Add Quote</span></a>
@@ -301,9 +308,9 @@ if (!empty($_SESSION['uname'])) {
           <a class="nav-link collapsed" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-receipt"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
-          
-          
-         
+
+
+
           <ul id="reports-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="projectReport.php" class="active">
@@ -312,7 +319,7 @@ if (!empty($_SESSION['uname'])) {
               <a href="attendanceReport.php">
                 <i class="bi bi-circle"></i><span>Attendance Report</span>
               </a>
-               <a href="timesheetReport.php">
+              <a href="timesheetReport.php">
                 <i class="bi bi-circle"></i><span>Timesheet Report</span>
               </a>
 
@@ -323,11 +330,12 @@ if (!empty($_SESSION['uname'])) {
             </li>
           </ul>
         </li>
-    <hr class="separator"><div class="color" style="background-color:#ADD8E6;color:#333d97">
-<span class="separator-text"><b>My Activities</b></span>
-</div>
-<hr class="separator">
-         <li class="nav-item">
+        <hr class="separator">
+        <div class="color" style="background-color:#ADD8E6;color:#333d97">
+          <span class="separator-text"><b>My Activities</b></span>
+        </div>
+        <hr class="separator">
+        <li class="nav-item">
           <a class="nav-link collapsed" href="addProfile.php">
             <i class="bi bi-person-lines-fill"></i>
             <span>Profile info</span></a>
@@ -343,37 +351,36 @@ if (!empty($_SESSION['uname'])) {
             <i class="bi bi-cash"></i>
             <span>My Payslip</span></a>
         </li>
-<?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
-                                    $result7 = mysqli_query($connect, $sql7);
-            
-                                    if ($result7) {
-                                      while ($row7 = mysqli_fetch_array($result7)) {
-                                        $name = $row7['name'];
-                                      
-                                      }
-                                    }
-                  $sql= "SELECT * FROM employee_details WHERE name='$name'";
-                                    $result = mysqli_query($connect, $sql);
-            
-                                    if ($result) {
-                                      while ($row = mysqli_fetch_array($result)) {
-                                        $head = $row['supervisor'];
-                                      
-                                      }
-                                    }        
-                                     $sql3= "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
-                                    $result3 = mysqli_query($connect, $sql3);
-            
-                                    if ($result3) {
-                                      while ($row3 = mysqli_fetch_array($result3)) {
-                                    echo $row3['name'];
-                                      ?>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="timesheet.php">
-            <i class="bi bi-clock-history"></i>
-            <span>My Timesheet</span></a>
-        </li>
-        <?php }} ?>
+        <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+        $result7 = mysqli_query($connect, $sql7);
+
+        if ($result7) {
+          while ($row7 = mysqli_fetch_array($result7)) {
+            $name = $row7['name'];
+          }
+        }
+        $sql = "SELECT * FROM employee_details WHERE name='$name'";
+        $result = mysqli_query($connect, $sql);
+
+        if ($result) {
+          while ($row = mysqli_fetch_array($result)) {
+            $head = $row['supervisor'];
+          }
+        }
+        $sql3 = "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
+        $result3 = mysqli_query($connect, $sql3);
+
+        if ($result3) {
+          while ($row3 = mysqli_fetch_array($result3)) {
+            echo $row3['name'];
+        ?>
+            <li class="nav-item">
+              <a class="nav-link collapsed" href="timesheet.php">
+                <i class="bi bi-clock-history"></i>
+                <span>My Timesheet</span></a>
+            </li>
+        <?php }
+        } ?>
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
             <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -427,10 +434,10 @@ if (!empty($_SESSION['uname'])) {
             </li>
           </ul>
 
-      <?php
+        <?php
       } else if ($_SESSION['role'] == 'S-Employee') {
 
-      ?>
+        ?>
         <li class="nav-item">
           <a class="nav-link collapsed" href="addProfile.php">
             <i class="bi bi-person-lines-fill"></i>
@@ -448,38 +455,37 @@ if (!empty($_SESSION['uname'])) {
             <i class="bi bi-cash"></i>
             <span>Payslip</span></a>
         </li>
-<?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
-                                    $result7 = mysqli_query($connect, $sql7);
-            
-                                    if ($result7) {
-                                      while ($row7 = mysqli_fetch_array($result7)) {
-                                        $name = $row7['name'];
-                                      
-                                      }
-                                    }
-                  $sql= "SELECT * FROM employee_details WHERE name='$name'";
-                                    $result = mysqli_query($connect, $sql);
-            
-                                    if ($result) {
-                                      while ($row = mysqli_fetch_array($result)) {
-                                        $head = $row['supervisor'];
-                                      
-                                      }
-                                    }        
-                                     $sql3= "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
-                                    $result3 = mysqli_query($connect, $sql3);
-            
-                                    if ($result3) {
-                                      while ($row3 = mysqli_fetch_array($result3)) {
-                                    echo $row3['name'];
-                                      ?>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="timesheet.php">
-            <i class="bi bi-clock-history"></i>
-            <span>My Timesheet</span></a>
-        </li>
+        <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+        $result7 = mysqli_query($connect, $sql7);
+
+        if ($result7) {
+          while ($row7 = mysqli_fetch_array($result7)) {
+            $name = $row7['name'];
+          }
+        }
+        $sql = "SELECT * FROM employee_details WHERE name='$name'";
+        $result = mysqli_query($connect, $sql);
+
+        if ($result) {
+          while ($row = mysqli_fetch_array($result)) {
+            $head = $row['supervisor'];
+          }
+        }
+        $sql3 = "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
+        $result3 = mysqli_query($connect, $sql3);
+
+        if ($result3) {
+          while ($row3 = mysqli_fetch_array($result3)) {
+            echo $row3['name'];
+        ?>
+            <li class="nav-item">
+              <a class="nav-link collapsed" href="timesheet.php">
+                <i class="bi bi-clock-history"></i>
+                <span>My Timesheet</span></a>
+            </li>
         <?php
-                                      }} ?>
+          }
+        } ?>
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
             <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -703,68 +709,63 @@ if (!empty($_SESSION['uname'])) {
 
     <script>
       // ShowUser
-      function editUser() {
-        var id = arguments[0];
-        // alert(id);
-        $.ajax({
-          method: "POST",
-          url: "showUser.php",
-          data: {
-            user_id: id
-          }, // serializes the form's elements.        
-          success: function(result) {
-            var data = jQuery.parseJSON(result);
-            $('#modalForEditUser').modal('show');
+     function editUser(user_id) {
+    $.ajax({
+        method: "POST",
+        url: "showUser.php",
+        data: { user_id },
+        dataType: "json",
+        success: function(data) {
+            // Populate inputs
             $('#edit_username').val(data.username);
             $('#edit_role').val(data.role);
             $('#edit_designation').val(data.designation);
-            $('#edit_supervisor').val(data.supervisor);
-            $('#edit_user_id').val(id);
-          }
-        });
-      }
+            $('#edit_user_id').val(user_id);
 
-      //EditUser
-      $("#editUserFrm").submit(function(e) {
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-        // alert("1");
-        let myform = document.getElementById("editUserFrm");
-        let fd = new FormData(myform);
-        $.ajax({
-          method: "POST",
-          dataType: "json",
-          url: "editUser.php",
-          data: fd, // serializes the form's elements.
-          processData: false,
-          contentType: false,
-          success: function(data) {
+            // Show modal
+            var modalEl = document.getElementById('modalForEditUser');
+            var myModal = new bootstrap.Modal(modalEl);
+            myModal.show();
+
+            // Set supervisor after modal is fully shown
+            modalEl.addEventListener('shown.bs.modal', function handler() {
+                if (data.supervisor) {
+                    $('#edit_supervisor').val(data.supervisor.trim());
+                }
+                modalEl.removeEventListener('shown.bs.modal', handler);
+            });
+        },
+        error: function(xhr) {
+            console.error("🚨 AJAX error:", xhr.status, xhr.responseText);
+        }
+    });
+}
+
+// Submit form
+$("#editUserFrm").submit(function(e) {
+    e.preventDefault();
+    let fd = new FormData(this);
+
+    $.ajax({
+        method: "POST",
+        url: "editUser.php",
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function(data) {
             if (data == 1) {
-              Swal.fire({
-                icon: "success",
-                text: "User details updated...",
-                type: "success",
-                timer: 2000,
-                showConfirmButton: false
-              })
-              setTimeout(function() {
-                location.reload();
-              }, 1000);
-            } else if (data == 2) {
-              Swal.fire({
-                type: "Error!",
-                text: 'Redundant...',
-                icon: 'error'
-              })
+                Swal.fire({ icon: "success", text: "User updated!", timer: 2000, showConfirmButton: false });
+                $('#modalForEditUser').modal('hide');
+                setTimeout(() => location.reload(), 1000);
             } else {
-              Swal.fire({
-                type: "Error!",
-                text: 'Try again later...',
-                icon: 'error'
-              })
+                Swal.fire({ icon: "error", text: "Update failed!" });
             }
-          }
-        });
-      });
+        }
+    });
+});
+
+
 
 
 
