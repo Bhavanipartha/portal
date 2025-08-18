@@ -661,7 +661,7 @@ if (!empty($_SESSION['uname'])){
                                             Status
                                         </th>
                                         
-                                        
+                                          <th>Actions</th>
                                        
                                         
                                     </tr>
@@ -717,9 +717,12 @@ mysqli_query($connect, $updateStatusSQL);
                                         {
                                             $output.='<span class="badge badge-success">Completed</span>';
                                         }
-                                        $output.='</td>                
-                                      
-                                        </tr>';
+                                       $output .= '<td style="white-space: nowrap;">
+    <i class="bi bi-pencil mr-3" style="cursor: pointer;" title="Edit Allocation" onclick="editAllocation(' . $row['p_id'] . ')"></i>
+    <i class="bi bi-trash" style="cursor: pointer;" title="Delete Allocation" onclick="deleteAllocation(' . $row['p_id'] . ')"></i>
+</td>';
+
+$output .= '</tr>';
 
                                         $i++;
                                     }
@@ -756,7 +759,7 @@ mysqli_query($connect, $updateStatusSQL);
       <!-- Copyright -->
     </footer>
 
-<?php include('includes/modalProject.php'); ?>
+<?php include('includes/modalAllocation.php'); ?>
 
 
 
@@ -773,9 +776,123 @@ mysqli_query($connect, $updateStatusSQL);
 <script src="assets/vendor/tinymce/tinymce.min.js"></script>
 <script src="assets/vendor/php-email-form/validate.js"></script>
 
+<script>
+
+function editAllocation(p_id) {
+  console.log("🛠 editAllocation() called with p_id:", p_id);
+
+  $.ajax({
+    type: "POST",
+    url: "showAllocation.php",
+    data: { p_id },
+    dataType: "json",
+    beforeSend: function () {
+      console.log("📤 Sending request to showAllocation.php with data:", { p_id });
+    },
+    success: function (data) {
+      console.log("✅ AJAX success. Raw data received:", data);
+
+             if (data && data.p_id) {
+    
+      $('#edit_alloc_prj_name').val(data.prj_name);
+      $('#edit_alloc_s_date').val(data.s_date);
+      $('#edit_alloc_e_date').val(data.e_date);
+      $('#edit_alloc_name').val(data.name);
+      $('#edit_alloc_p_id').val(data.p_id);
+
+       const el = document.getElementById('modalForEditAllocation');
+        if (el) {
+          var myModal = new bootstrap.Modal(el);
+          myModal.show();
+        } else {
+          console.error("❌ Modal with ID 'modalForEditAllocation' not found in DOM.");
+        }
+      } else {
+        Swal.fire({ icon: "error", text: "Invalid allocation data received." });
+      }
+    },
+    error: function (xhr) {
+      console.error("🚨 AJAX error:", xhr.status, xhr.responseText);
+    }
+  });
+}
+
+
+$("#editAllocationFrm").submit(function(e) {
+  e.preventDefault();
+
+  let fd = new FormData(this);
+
+  $.ajax({
+    url: "editAllocation.php",
+    method: "POST",
+    data: fd,
+    processData: false,
+    contentType: false,
+    dataType: "json",
+    success: function (data) {
+      console.log("✅ Parsed JSON:", data);
+      if (data == 1) {
+        Swal.fire({
+          icon: "success",
+          text: "Allocation updated successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setTimeout(() => location.reload(), 1000);
+      } else if (data == 2) {
+        Swal.fire({ icon: "error", text: "Duplicate end date found!" });
+      } else {
+        Swal.fire({ icon: "error", text: "Update failed!" });
+      }
+    },
+    error: function (xhr) {
+      console.error("❌ Response text:", xhr.responseText);
+    }
+  });
+});
+
+
+function deleteAllocation(p_id) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This will permanently delete the allocation!",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "deleteAllocation.php",
+        method: "POST",
+        data: { p_id },
+        success: function(data) {
+          if (data == 1) {
+            Swal.fire({
+              icon: "success",
+              text: "Allocation deleted...",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            Swal.fire({ icon: "error", text: 'Try again later...' });
+          }
+        },
+        error: function(exception) {
+          console.log('Error:', exception);
+        }
+      });
+    }
+  });
+}
+
+</script>
+
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
 <script src="./assets/js/ajax.js"></script>
+
 
 <!-- Bootstrap core JavaScript-->
 <script src="./assets/vendor/jquery/jquery.min.js"></script>

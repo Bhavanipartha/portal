@@ -1,6 +1,9 @@
 
 /* ----------------- PROJECT FUNCTIONS ------------------ */
 
+
+
+
 // Show Project
 function editProject(p_id) {
   console.log("🛠 editProject() called with p_id:", p_id);

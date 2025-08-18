@@ -56,18 +56,17 @@ if (!empty($_SESSION['uname'])) {
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
   <script src="https: //unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-  </script>
 
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     .header {
       color: grey;
@@ -90,6 +89,17 @@ if (!empty($_SESSION['uname'])) {
       margin: 10px 0;
       /* Add margin for spacing */
     }
+
+    /* Remove underline from all sidebar nav links */
+#sidebar-nav a {
+  text-decoration: none !important;
+}
+
+/* Optional: make sure hover doesn't add underline either */
+#sidebar-nav a:hover {
+  text-decoration: none !important;
+}
+
 
     .separator-text {
       display: block;
@@ -709,61 +719,87 @@ if (!empty($_SESSION['uname'])) {
 
     <script>
       // ShowUser
-     function editUser(user_id) {
+    function editUser(user_id) {
+  $.ajax({
+    method: "POST",
+    url: "showUser.php",
+    data: { user_id },
+    dataType: "json",
+    success: function(data) {
+      $('#edit_username').val(data.username);
+      $('#edit_role').val(data.role);
+      $('#edit_designation').val(data.designation);
+      $('#edit_user_id').val(data.user_id);
+console.log("Role sent:", data.role);
+console.log("Current user name sent:", data.username);
+
+      // Load supervisors based on role
     $.ajax({
-        method: "POST",
-        url: "showUser.php",
-        data: { user_id },
-        dataType: "json",
-        success: function(data) {
-            // Populate inputs
-            $('#edit_username').val(data.username);
-            $('#edit_role').val(data.role);
-            $('#edit_designation').val(data.designation);
-            $('#edit_user_id').val(user_id);
+  method: "POST",
+  url: "getSupervisors.php",
+ data: { 
+  role: data.role,
+  current_name: data.name   // ✅ use display name
+},
 
-            // Show modal
-            var modalEl = document.getElementById('modalForEditUser');
-            var myModal = new bootstrap.Modal(modalEl);
-            myModal.show();
+  dataType: "json",
+  success: function(supList) {
+    const $supSelect = $('#edit_supervisor');
+    $supSelect.empty();
+    $supSelect.append('<option value="">Select Supervisor</option>');
 
-            // Set supervisor after modal is fully shown
-            modalEl.addEventListener('shown.bs.modal', function handler() {
-                if (data.supervisor) {
-                    $('#edit_supervisor').val(data.supervisor.trim());
-                }
-                modalEl.removeEventListener('shown.bs.modal', handler);
-            });
-        },
-        error: function(xhr) {
-            console.error("🚨 AJAX error:", xhr.status, xhr.responseText);
-        }
-    });
+    supList.forEach(function(name) {
+  const selected = (name.trim() === data.supervisor?.trim()) ? 'selected' : '';
+  $supSelect.append(`<option value="${name}" ${selected}>${name}</option>`);
+});
+
+  }
+});
+
+
+      // Show modal (Bootstrap 4)
+      $('#modalForEditUser').modal('show');
+    },
+    error: function(xhr) {
+      console.error("🚨 AJAX error:", xhr.status, xhr.responseText);
+    }
+  });
 }
 
-// Submit form
-$("#editUserFrm").submit(function(e) {
-    e.preventDefault();
-    let fd = new FormData(this);
 
-    $.ajax({
-        method: "POST",
-        url: "editUser.php",
-        data: fd,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function(data) {
+
+
+      // Submit form
+      $("#editUserFrm").submit(function(e) {
+        e.preventDefault();
+        let fd = new FormData(this);
+
+        $.ajax({
+          method: "POST",
+          url: "editUser.php",
+          data: fd,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function(data) {
             if (data == 1) {
-                Swal.fire({ icon: "success", text: "User updated!", timer: 2000, showConfirmButton: false });
-                $('#modalForEditUser').modal('hide');
-                setTimeout(() => location.reload(), 1000);
+              Swal.fire({
+                icon: "success",
+                text: "User updated!",
+                timer: 2000,
+                showConfirmButton: false
+              });
+              $('#modalForEditUser').modal('hide');
+              setTimeout(() => location.reload(), 1000);
             } else {
-                Swal.fire({ icon: "error", text: "Update failed!" });
+              Swal.fire({
+                icon: "error",
+                text: "Update failed!"
+              });
             }
-        }
-    });
-});
+          }
+        });
+      });
 
 
 
