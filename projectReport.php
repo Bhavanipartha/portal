@@ -22,10 +22,10 @@ if (isset($_POST["name"])) {
     function fetch_data()
 
     {
-      $localhost = "localhost";
-      $username = "root";
-      $password = "";
-      $dbname = "genai-employee";
+      // $localhost = "localhost";
+      // $username = "root";
+      // $password = "";
+      // $dbname = "genai-employee";
       if (isset($_POST["name"])) {
 
         $name = $_POST['name'];
@@ -43,7 +43,8 @@ if (isset($_POST["name"])) {
       $output = '';
 
       $sql = "SELECT * FROM project_allocation WHERE month(s_date)='$month' AND year(s_date)='$year'";
-      $connect = new mysqli($localhost, $username, $password, $dbname);
+      // $connect = new mysqli($localhost, $username, $password, $dbname);
+      global $connect; 
       $result = mysqli_query($connect, $sql);
       $n = $result->num_rows;
       if ($n != 0) {
@@ -110,10 +111,10 @@ if (isset($_POST["name"])) {
     function fetch_data()
 
     {
-      $localhost = "localhost";
-      $username = "root";
-      $password = "";
-      $dbname = "genai-employee";
+      // $localhost = "localhost";
+      // $username = "root";
+      // $password = "";
+      // $dbname = "genai-employee";
       if (isset($_POST["name"])) {
 
         $name = $_POST['name'];
@@ -131,7 +132,8 @@ if (isset($_POST["name"])) {
       $output = '';
 
       $sql = "SELECT * FROM project_allocation WHERE month(s_date)='$month' AND year(s_date)='$year' and name='$name'";
-      $connect = new mysqli($localhost, $username, $password, $dbname);
+      // $connect = new mysqli($localhost, $username, $password, $dbname);
+      global $connect; 
       $result = mysqli_query($connect, $sql);
       $n = $result->num_rows;
       if ($n != 0) {

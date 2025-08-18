@@ -10,12 +10,13 @@ if (empty($_SESSION['uname'])) {
 $Username = $_SESSION['uname'];
 
 function fetch_data() {
-  $localhost = "localhost";
-  $username = "root";
-  $password = "";
-  $dbname = "genai-employee";
+  // $localhost = "localhost";
+  // $username = "root";
+  // $password = "";
+  // $dbname = "genai-employee";
 
-  $connect = new mysqli($localhost, $username, $password, $dbname);
+// $connect = new mysqli($localhost, $username, $password, $dbname);
+global $connect; 
 
   if (isset($_POST["name"])) {
     $name = $_POST['name'];
