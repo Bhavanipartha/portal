@@ -622,24 +622,39 @@ if (!empty($_SESSION['uname'])){
              
 
                 <div class="row g-3">
-                  <div class="col-md-4 col-sm-12">
-                    <label for="Image" class="form-label">Photo</label>
-                    <input class="form-control" name="userFile" type="file" id="formFile" onchange="preview()" required>
-                  </div>
-                  <div class="col-md-4 col-sm-12">
-                    <img id="frame" src="" class="img-fluid rounded" style="height:150px" />
-                  </div>
-                </div>
-                <script>
-                  function preview() {
-                    frame.src = URL.createObjectURL(event.target.files[0]);
-                  }
+  <div class="col-md-4 col-sm-12">
+    <label for="Image" class="form-label">Photo</label>
+    <input 
+      class="form-control" 
+      name="userFile" 
+      type="file" 
+      id="formFile" 
+      accept=".jpg, .jpeg, image/jpeg" 
+      onchange="preview()" 
+      required>
+  </div>
+  <div class="col-md-4 col-sm-12">
+    <img id="frame" src="" class="img-fluid rounded" style="height:150px" />
+  </div>
+</div>
 
-                  function clearImage() {
-                    document.getElementById('formFile').value = null;
-                    frame.src = "";
-                  }
-                </script>
+<script>
+  function preview() {
+    const file = event.target.files[0];
+    if (file && file.type !== "image/jpeg") {
+      alert("Only JPG images are allowed!");
+      clearImage();
+      return;
+    }
+    frame.src = URL.createObjectURL(file);
+  }
+
+  function clearImage() {
+    document.getElementById('formFile').value = null;
+    frame.src = "";
+  }
+</script>
+
                 <div class="row g-3 mt-2">
                   <div class="col-md-4 col-sm-12">
                     <div class="form-floating">
