@@ -7,7 +7,17 @@ if (!empty($_SESSION['uname'])){
 }else{
   header("Location: ./index.html");
 }
+$sqlRestrict = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+$resultRestrict = mysqli_query($connect, $sqlRestrict);
+$name = '';
 
+if ($resultRestrict) {
+  if ($row7 = mysqli_fetch_array($resultRestrict)) {
+    $name = $row7['name'];
+  }
+}
+
+$restrictMenu = in_array($_SESSION['role'], ['Employee', 'S-Employee']) && $name === '-';
 ?>
 
 <!DOCTYPE html>
@@ -107,7 +117,11 @@ if (!empty($_SESSION['uname'])){
   background-color:#ADD8E6  ;
   
 }
-
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
   
   </style>
 </head>
@@ -254,113 +268,160 @@ if (!empty($_SESSION['uname'])){
     </li>
 
 
-  <?php
-  } else if ($_SESSION['role'] == 'S-Employee') {
+ <?php
+      } else if ($_SESSION['role'] == 'S-Employee') {
 
-  ?>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="addProfile.php">
-        <i class="bi bi-person-lines-fill"></i>
-        <span>Profile info</span></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="myProject.php">
-        <i class="bi bi-display"></i>
-        <span>My Projects</span></a>
-    </li>
-
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="getPayslip.php">
-        <i class="bi bi-cash"></i>
-        <span>Payslip</span></a>
-    </li>
-
-   <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
-                                    $result7 = mysqli_query($connect, $sql7);
-            
-                                    if ($result7) {
-                                      while ($row7 = mysqli_fetch_array($result7)) {
-                                        $name = $row7['name'];
-                                      
-                                      }
-                                    }
-                  $sql= "SELECT * FROM employee_details WHERE name='$name'";
-                                    $result = mysqli_query($connect, $sql);
-            
-                                    if ($result) {
-                                      while ($row = mysqli_fetch_array($result)) {
-                                        $head = $row['supervisor'];
-                                      
-                                      }
-                                    }        
-                                     $sql3= "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
-                                    $result3 = mysqli_query($connect, $sql3);
-            
-                                    if ($result3) {
-                                      while ($row3 = mysqli_fetch_array($result3)) {
-                                    echo $row3['name'];
-                                      ?>
+      ?>
         <li class="nav-item">
-          <a class="nav-link collapsed" href="timesheet.php">
-            <i class="bi bi-clock-history"></i>
-            <span>My Timesheet</span></a>
+          <a class="nav-link collapsed" href="addProfile.php">
+            <i class="bi bi-person-lines-fill"></i>
+            <span>Profile info</span></a>
         </li>
+ <?php
+// Debug log for PHP (you'll see this in the HTML source or browser console if you echo inside <script>)
+echo "<!-- DEBUG: role=" . $_SESSION['role'] . ", name=" . htmlspecialchars($name) . ", restrictMenu=" . ($restrictMenu ? 'true' : 'false') . " -->";
+?>
+
+<li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
+
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
+
+        <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+        $result7 = mysqli_query($connect, $sql7);
+
+        if ($result7) {
+          while ($row7 = mysqli_fetch_array($result7)) {
+            $name = $row7['name'];
+          }
+        }
+        $sql = "SELECT * FROM employee_details WHERE name='$name'";
+        $result = mysqli_query($connect, $sql);
+
+        if ($result) {
+          while ($row = mysqli_fetch_array($result)) {
+            $head = $row['supervisor'];
+          }
+        }
+        $sql3 = "SELECT * FROM employee_details WHERE supervisor='$head' AND role='Super-admin'";
+        $result3 = mysqli_query($connect, $sql3);
+
+        if ($result3) {
+          while ($row3 = mysqli_fetch_array($result3)) {
+            echo $row3['name'];
+        ?>
+           <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
         <?php
-                                      }} ?>
-    <li class="nav-item">
-      <a class="nav-link " data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-        <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
+          }
+        } ?>
+       <li class="nav-item">
+  <a class="nav-link <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="leave-nav" 
+      class="nav-content collapse <?php echo in_array(basename($_SERVER['PHP_SELF']), ['requestLeave.php', 'manageLeave.php']) ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
       </a>
-      <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="requestLeave.php">
-            <i class="bi bi-circle"></i><span>Request leave</span>
-          </a>
-        </li>
-        <li>
-          <a href="manageLeave.php"  class="active">
-            <i class="bi bi-circle"></i><span>My Requests</span>
-          </a>
-        </li>
-
-
-      </ul>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#subjects-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-display"></i><span>Projects</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="subjects-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="projectAllocation.php">
-            <i class="bi bi-circle"></i><span>Project Allocation</span>
-          </a>
-        </li>
-        <li>
-          <a href="manageAllocation.php">
-            <i class="bi bi-circle"></i><span>Manage Allocation</span>
-          </a>
-        </li>
-      </ul>
-    <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#approvals-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-check2-square"></i><span>Approvals</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="approvals-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="leaveRequest.php">
-            <i class="bi bi-circle"></i><span>Employee leave requests</span>
-          </a>
-        </li>
-        <li>
-          <a href="approveTimesheet.php">
-            <i class="bi bi-circle"></i> <span>Employee Timesheet</span></a>
 
-        </li>
-      </ul>
-      <?php
-     }else if ($_SESSION['role'] == 'S-admin') {
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'manageLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#subjects-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#subjects-nav'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="subjects-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'projectAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Project Allocation</span>
+      </a>
+    </li>
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Manage Allocation</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#approvals-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#approvals-nav'; ?>">
+    <i class="bi bi-check2-square"></i>
+    <span>Approvals</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="approvals-nav" 
+      class="nav-content collapse <?php echo in_array(basename($_SERVER['PHP_SELF']), ['leaveRequest.php', 'approveTimesheet.php']) ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'leaveRequest.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'leaveRequest.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee leave requests</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'approveTimesheet.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'approveTimesheet.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee Timesheet</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
+          </ul>
+        <?php
+      }else if ($_SESSION['role'] == 'S-admin') {
       ?>
       
         <li class="nav-item">
@@ -531,51 +592,70 @@ if (!empty($_SESSION['uname'])){
     <?php
   }
   if ($_SESSION['role'] == 'Employee') {
-    ?>
-      <!-- End Forms Nav -->
+        ?>
+          <!-- End Forms Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="addProfile.php">
-        <i class="bi bi-person-lines-fill"></i>
-        <span>Profile info</span></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="myProject.php">
-        <i class="bi bi-display"></i>
-        <span>Projects</span></a>
-    </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="addProfile.php">
+            <i class="bi bi-person-lines-fill"></i>
+            <span>Profile info</span></a>
+        </li>
+        <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
 
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="getPayslip.php">
-        <i class="bi bi-cash"></i>
-        <span>Payslip</span></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="timesheet.php">
-        <i class="bi bi-clock-history"></i>
-        <span>Timesheet</span></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link " data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-        <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
+
+        <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
+        <li class="nav-item">
+  <a class="nav-link <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="leave-nav" 
+      class="nav-content collapse <?php echo basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
       </a>
-      <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="requestLeave.php">
-            <i class="bi bi-circle"></i><span>Request leave</span>
-          </a>
-        </li>
-
-        <li>
-          <a href="manageLeave.php"  class="active">
-            <i class="bi bi-circle"></i><span>My Requests</span>
-          </a>
-        </li>
-      </ul>
     </li>
 
-    <!-- End Tables Nav -->
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'manageLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
+        <!-- End Tables Nav -->
 </ul>
 <?php } ?>
 </aside><!-- End Sidebar-->
@@ -627,90 +707,77 @@ return true;
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                             <div class="card">                       
                               <div class="container p-4" style="overflow:auto">
-                                    <table class="table table-striped" id="dataTable">
-                                        <thead>
-                                            <tr class="">
-                                                <th>
-                                                    #
-                                                </th>
-                                                <th>
-                                                    Leave Type
-                                                </th>
-                                                <th>
-                                                  Reason
-                                                </th>
-                                                <th>
-                                                    Duration
-                                                </th>
-                                               
-                                               
-                                                <th>
-                                                    Status
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                        
-                                            date_default_timezone_set('Asia/Kolkata');
-                                            $sql1 = "SELECT * FROM employee_details WHERE email = '".$_SESSION['uname']."'";
-                                            $result1 = $connect->query($sql1);
-                                            $row1 = $result1->fetch_assoc();
-                                            $name = $row1['name'];
+                                   <table class="table table-striped" id="dataTable">
+  <thead>
+    <tr class="">
+      <th>#</th>
+      <th>Leave Type</th>
+      <th>Reason</th>
+      <th>Duration</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    date_default_timezone_set('Asia/Kolkata');
+    $sql1 = "SELECT * FROM employee_details WHERE email = '".$_SESSION['uname']."'";
+    $result1 = $connect->query($sql1);
+    $row1 = $result1->fetch_assoc();
+    $name = $row1['name'];
 
-                                            
-                                            $sql = "SELECT * FROM leave_request WHERE name = '$name'";
-                                            $result = $connect->query($sql);
-                                            $n =$result->num_rows;
-                                            if($n == 0){
-                                             echo" <tr>
-                                                            <td>No Records..!</td>
-                                                        </tr>";
-                                            } else{
-                                            $i = 1;
-                                            $output = '';                                            
-                                            while ($row = $result->fetch_array()) {    
-                                       
-                                            
-                                              $leave = $row['leave_type'];
-                                              $reason = $row['reason'];
-                                                
-                                                if($row['to_date']){
-                                                    $datee = $row['from_date'].' to '.$row['to_date'] ;
-                                                } 
-                                                else{
-                                                    $datee = $row['from_date'] ;
-                                                }
+    $sql = "SELECT * FROM leave_request WHERE name = '$name' AND approved_status != 3";
+    $result = $connect->query($sql);
+    $n = $result->num_rows;
 
+    if ($n == 0) {
+      echo "<tr><td colspan='6' class='text-center'>No Records..!</td></tr>";
+    } else {
+      $i = 1;
+      while ($row = $result->fetch_array()) {
+        $leave  = $row['leave_type'];
+        $reason = $row['reason'];
+        $datee  = $row['to_date'] ? $row['from_date'].' to '.$row['to_date'] : $row['from_date'];
 
-                                                $output .= '<tr>                    
-                                                <td>' . $i . '</td>
-                                                <td>' . $leave  . ' </td>
-                                                <td>' . $reason  . ' </td>
-                                                <td> Date : ' .$datee .'
-                                                </td>                                        
-                                                                                    
-                                                <td style="white-space: nowrap;">';                                            
-                                                if($row['approved_status'] == 0){
-                                                    $output.='<span class="badge badge-warning">Pending</span>';
-                                                }
-                                                else if($row['approved_status'] == 1)
-                                                {
-                                                    $output.='<span class="badge badge-success">Approved</span>';
-                                                }
-                                                else 
-                                                {
-                                                    $output.='<span class="badge badge-danger">Rejected</span>';
-                                                }
-                                                $output.='</td>
-                                                </tr>';
+        echo "<tr>
+                <td>{$i}</td>
+                <td>{$leave}</td>
+                <td>{$reason}</td>
+                <td>Date : {$datee}</td>
+                <td style='white-space: nowrap;'>";
 
-                                                $i++;
-                                            }
-                                            echo $output;}
-                                            ?>
-                                        </tbody>
-                                    </table>
+        if ($row['approved_status'] == 0) {
+          echo '<span class="badge badge-warning">Pending</span>';
+        } elseif ($row['approved_status'] == 1) {
+          echo '<span class="badge badge-success">Approved</span>';
+        } else {
+          echo '<span class="badge badge-danger">Rejected</span>';
+        }
+
+       echo "</td>
+      <td>"; 
+
+if ($row['approved_status'] == 0) {
+  echo '<form method="POST" action="deleteLeave.php" style="display:inline;">
+          <input type="hidden" name="leave_id" value="'.$row['sl_id'].'">
+          <button type="submit" class="btn btn-link p-0 m-0" 
+                  onclick="return confirm(\'Are you sure you want to delete this request?\')" 
+                  title="Delete">
+            <i class="bi bi-trash text-danger"></i> <!-- ✅ Just Trash Icon -->
+          </button>
+        </form>';
+}
+
+echo "</td>
+      </tr>";
+$i++;
+
+      }
+    }
+    ?>
+  </tbody>
+</table>
+
                                     
                                 </div>
                               </div>

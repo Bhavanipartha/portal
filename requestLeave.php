@@ -6,7 +6,17 @@ if (!empty($_SESSION['uname'])) {
 } else {
   header("Location: ./index.html");
 }
+$sqlRestrict = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+$resultRestrict = mysqli_query($connect, $sqlRestrict);
+$name = '';
 
+if ($resultRestrict) {
+  if ($row7 = mysqli_fetch_array($resultRestrict)) {
+    $name = $row7['name'];
+  }
+}
+
+$restrictMenu = in_array($_SESSION['role'], ['Employee', 'S-Employee']) && $name === '-';
 ?>
 
 
@@ -141,6 +151,12 @@ if (!empty($_SESSION['uname'])) {
       background-color: #ADD8E6;
 
     }
+
+    .disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
   </style>
 </head>
 <script>
@@ -529,7 +545,7 @@ if (!empty($_SESSION['uname'])) {
           </ul>
         </li>
 
-      <?php
+     <?php
       } else if ($_SESSION['role'] == 'S-Employee') {
 
       ?>
@@ -538,17 +554,26 @@ if (!empty($_SESSION['uname'])) {
             <i class="bi bi-person-lines-fill"></i>
             <span>Profile info</span></a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="myProject.php">
-            <i class="bi bi-display"></i>
-            <span>My Projects</span></a>
-        </li>
+ <?php
+// Debug log for PHP (you'll see this in the HTML source or browser console if you echo inside <script>)
+echo "<!-- DEBUG: role=" . $_SESSION['role'] . ", name=" . htmlspecialchars($name) . ", restrictMenu=" . ($restrictMenu ? 'true' : 'false') . " -->";
+?>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="getPayslip.php">
-            <i class="bi bi-cash"></i>
-            <span>Payslip</span></a>
-        </li>
+<li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
+
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
 
         <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
         $result7 = mysqli_query($connect, $sql7);
@@ -573,65 +598,104 @@ if (!empty($_SESSION['uname'])) {
           while ($row3 = mysqli_fetch_array($result3)) {
             echo $row3['name'];
         ?>
-            <li class="nav-item">
-              <a class="nav-link collapsed" href="timesheet.php">
-                <i class="bi bi-clock-history"></i>
-                <span>My Timesheet</span></a>
-            </li>
+           <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
         <?php
           }
         } ?>
-        <li class="nav-item">
-          <a class="nav-link " data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-            <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="requestLeave.php" class="active">
-                <i class="bi bi-circle"></i><span>Request leave</span>
-              </a>
-            </li>
-            <li>
-              <a href="manageLeave.php">
-                <i class="bi bi-circle"></i><span>My Requests</span>
-              </a>
-            </li>
+      <li class="nav-item">
+  <a class="nav-link <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="leave-nav" 
+      class="nav-content collapse <?php echo in_array(basename($_SERVER['PHP_SELF']), ['requestLeave.php', 'manageLeave.php']) ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'manageLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
 
 
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#subjects-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-display"></i><span>Projects</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="subjects-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="projectAllocation.php">
-                <i class="bi bi-circle"></i><span>Project Allocation</span>
-              </a>
-            </li>
-            <li>
-              <a href="manageAllocation.php">
-                <i class="bi bi-circle"></i><span>Manage Allocation</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#approvals-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-check2-square"></i><span>Approvals</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="approvals-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="leaveRequest.php">
-                <i class="bi bi-circle"></i><span>Employee leave requests</span>
-              </a>
-            </li>
-            <li>
-              <a href="approveTimesheet.php">
-                <i class="bi bi-circle"></i> <span>Employee Timesheet</span></a>
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#subjects-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#subjects-nav'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
 
-            </li>
+  <ul id="subjects-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'projectAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Project Allocation</span>
+      </a>
+    </li>
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Manage Allocation</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#approvals-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#approvals-nav'; ?>">
+    <i class="bi bi-check2-square"></i>
+    <span>Approvals</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="approvals-nav" 
+      class="nav-content collapse <?php echo in_array(basename($_SERVER['PHP_SELF']), ['leaveRequest.php', 'approveTimesheet.php']) ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'leaveRequest.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'leaveRequest.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee leave requests</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'approveTimesheet.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'approveTimesheet.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee Timesheet</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
           </ul>
         <?php
       }
@@ -645,42 +709,63 @@ if (!empty($_SESSION['uname'])) {
             <span>Profile info</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link collapsed" href="myProject.php">
-            <i class="bi bi-display"></i>
-            <span>Projects</span></a>
-        </li>
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
+
 
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="getPayslip.php">
-            <i class="bi bi-cash"></i>
-            <span>Payslip</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="timesheet.php">
-            <i class="bi bi-clock-history"></i>
-            <span>Timesheet</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-            <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="requestLeave.php" class="active">
-                <i class="bi bi-circle"></i><span>Request leave</span>
-              </a>
-            </li>
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
+      <li class="nav-item">
+  <a class="nav-link <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
 
-            <li>
-              <a href="manageLeave.php">
-                <i class="bi bi-circle"></i><span>My Requests</span>
-              </a>
-            </li>
-          </ul>
-        </li>
+  <ul id="leave-nav" 
+      class="nav-content collapse <?php echo basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? 'show' : ''; ?>" 
+      data-bs-parent="#sidebar-nav">
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'requestLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'manageLeave.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
 
         <!-- End Tables Nav -->
+
     </ul>
   <?php } ?>
   </aside><!-- End Sidebar-->

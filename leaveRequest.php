@@ -1,14 +1,28 @@
 <?php
-
 session_start();
 require 'config/conn.php';
+
 if (!empty($_SESSION['uname'])) {
   $Username = $_SESSION['uname'];
 } else {
   header("Location: ./index.html");
+  exit;
 }
 
+$sqlRestrict = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+$resultRestrict = mysqli_query($connect, $sqlRestrict);
+$name = '';
+
+if ($resultRestrict) {
+  if ($row7 = mysqli_fetch_array($resultRestrict)) {
+    $name = $row7['name'];
+  }
+}
+
+$restrictMenu = in_array($_SESSION['role'], ['Employee', 'S-Employee']) && $name === '-';
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -112,6 +126,15 @@ if (!empty($_SESSION['uname'])) {
       background-color: #ADD8E6;
 
     }
+
+    
+    
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
   </style>
 </head>
 
@@ -163,8 +186,27 @@ if (!empty($_SESSION['uname'])) {
       alert('Network error occurred. Please try again.');
     };
     xhr.send(formData);
+  //console.log("Preparing to send email");
+        // console.log("users:", selectedUsernames);
+        // var recipients = selectedUsernames;
+        // console.log("Recipients:", recipients);
+
+        // Email.send({
+        //     Host: "smtp.elasticemail.com",
+        //     Username: "2023.GenAI@gmail.com",
+        //     Password: "63D023AEC0185FAA7EF8900FB946765F2E5F",
+        //     To: recipients.join(','), // Join the usernames into a comma-separated string
+        //     From: "2023.GenAI@gmail.com",
+        //     Subject: "Leave request Status",
+        //     Body: 'Leave Request ' +buttonValue
+        // }).then(function (message) {
+        //     console.log("Email sent:", message);
+        // }).catch(function (error) {
+        //     console.error("Email error:", error);
+        //     alert('Error sending email. Please try again.');
+        // });  
   }
-</script>
+  </script>
 
   <div class="fixed-top">
     <div class="container-fluid  navbar-cg p-2" style="margin-bottom:-15px; background-image: url('./assets/img/240_F_303562524_QfNWIptUFfYdGbR0AdcA0wJ0pZuJfW2w.jpg');  
@@ -535,17 +577,26 @@ if (!empty($_SESSION['uname'])) {
             <i class="bi bi-person-lines-fill"></i>
             <span>Profile info</span></a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="myProject.php">
-            <i class="bi bi-display"></i>
-            <span>My Projects</span></a>
-        </li>
+ <?php
+// Debug log for PHP (you'll see this in the HTML source or browser console if you echo inside <script>)
+echo "<!-- DEBUG: role=" . $_SESSION['role'] . ", name=" . htmlspecialchars($name) . ", restrictMenu=" . ($restrictMenu ? 'true' : 'false') . " -->";
+?>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="getPayslip.php">
-            <i class="bi bi-cash"></i>
-            <span>Payslip</span></a>
-        </li>
+<li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
+
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
 
         <?php $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
         $result7 = mysqli_query($connect, $sql7);
@@ -570,65 +621,96 @@ if (!empty($_SESSION['uname'])) {
           while ($row3 = mysqli_fetch_array($result3)) {
             echo $row3['name'];
         ?>
-            <li class="nav-item">
-              <a class="nav-link collapsed" href="timesheet.php">
-                <i class="bi bi-clock-history"></i>
-                <span>My Timesheet</span></a>
-            </li>
+           <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
         <?php
           }
         } ?>
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-            <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="requestLeave.php">
-                <i class="bi bi-circle"></i><span>Request leave</span>
-              </a>
-            </li>
-            <li>
-              <a href="manageLeave.php">
-                <i class="bi bi-circle"></i><span>My Requests</span>
-              </a>
-            </li>
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav" data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="leave-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#subjects-nav"
+     data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#subjects-nav'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="subjects-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'projectAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Project Allocation</span>
+      </a>
+    </li>
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageAllocation.php'; ?>">
+        <i class="bi bi-circle"></i><span>Manage Allocation</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     <?php if (!$restrictMenu) { ?>
+       data-bs-target="#approvals-nav" data-bs-toggle="collapse"
+     <?php } ?>
+     href="<?php echo $restrictMenu ? '#' : '#approvals-nav'; ?>">
+    <i class="bi bi-check2-square"></i>
+    <span>Approvals</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+
+  <ul id="approvals-nav" class="nav-content collapse <?php echo in_array(basename($_SERVER['PHP_SELF']), ['leaveRequest.php','approveTimesheet.php']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'leaveRequest.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'leaveRequest.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee leave requests</span>
+      </a>
+    </li>
+    <li>
+      <a class="<?php echo ($restrictMenu ? 'disabled-link' : '') . (basename($_SERVER['PHP_SELF']) == 'approveTimesheet.php' ? ' active' : ''); ?>"
+         href="<?php echo $restrictMenu ? '#' : 'approveTimesheet.php'; ?>">
+        <i class="bi bi-circle"></i><span>Employee Timesheet</span>
+      </a>
+    </li>
+  </ul>
+</li>
 
 
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#subjects-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-display"></i><span>Projects</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="subjects-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="projectAllocation.php">
-                <i class="bi bi-circle"></i><span>Project Allocation</span>
-              </a>
-            </li>
-            <li>
-              <a href="manageAllocation.php">
-                <i class="bi bi-circle"></i><span>Manage Allocation</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " data-bs-target="#approvals-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-check2-square"></i><span>Approvals</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="approvals-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="leaveRequest.php" class="active">
-                <i class="bi bi-circle"></i><span>Employee leave requests</span>
-              </a>
-            </li>
-            <li>
-              <a href="approveTimesheet.php">
-                <i class="bi bi-circle"></i> <span> Employee Timesheet</span></a>
-
-            </li>
           </ul>
         <?php
       }
@@ -642,40 +724,55 @@ if (!empty($_SESSION['uname'])) {
             <span>Profile info</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link collapsed" href="myProject.php">
-            <i class="bi bi-display"></i>
-            <span>Projects</span></a>
-        </li>
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'myProject.php'; ?>">
+    <i class="bi bi-display"></i>
+    <span>Projects</span>
+  </a>
+</li>
+
 
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="getPayslip.php">
-            <i class="bi bi-cash"></i>
-            <span>Payslip</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="timesheet.php">
-            <i class="bi bi-clock-history"></i>
-            <span>Timesheet</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#leave-nav" data-bs-toggle="collapse" href="#students-nav">
-            <i class=" bi bi-calendar3"></i> <span>Leave details</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="leave-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-            <li>
-              <a href="requestLeave.php">
-                <i class="bi bi-circle"></i><span>Request leave</span>
-              </a>
-            </li>
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'getPayslip.php'; ?>">
+    <i class="bi bi-cash"></i>
+    <span>Payslip</span>
+  </a>
+</li>
+     <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     href="<?php echo $restrictMenu ? '#' : 'timesheet.php'; ?>">
+    <i class="bi bi-clock-history"></i>
+    <span>Timesheet</span>
+  </a>
+</li>
+       <li class="nav-item">
+  <a class="nav-link collapsed <?php if ($restrictMenu) echo 'disabled-link'; ?>"
+     data-bs-target="#leave-nav" data-bs-toggle="<?php echo $restrictMenu ? '' : 'collapse'; ?>"
+     href="<?php echo $restrictMenu ? '#' : '#leave-nav'; ?>">
+    <i class="bi bi-calendar3"></i>
+    <span>Leave details</span>
+    <i class="bi bi-chevron-down ms-auto"></i>
+  </a>
 
-            <li>
-              <a href="manageLeave.php">
-                <i class="bi bi-circle"></i><span>My Requests</span>
-              </a>
-            </li>
-          </ul>
-        </li>
+  <ul id="leave-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'requestLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>Request leave</span>
+      </a>
+    </li>
+
+    <li>
+      <a class="<?php if ($restrictMenu) echo 'disabled-link'; ?>"
+         href="<?php echo $restrictMenu ? '#' : 'manageLeave.php'; ?>">
+        <i class="bi bi-circle"></i><span>My Requests</span>
+      </a>
+    </li>
+  </ul>
+</li>
+
 
         <!-- End Tables Nav -->
     </ul>
@@ -795,173 +892,183 @@ if (!empty($_SESSION['uname'])) {
           </div>
 
 
-          <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-            <div class="card">
-              <div class="container p-4" style="overflow:auto">
-                <table class="table table-striped" id="dataTable1">
-                  <thead>
-                    <tr class="">
-                      <th>
-                        #
-                      </th>
-                      <th>
-                        Employee Name
-                      </th>
-                      <th>
-                        Leave Type
-                      </th>
-                      <th>
-                        Duration
-                      </th>
-                      <th>
-                        Reason
-                      </th>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+ <div class="card">
+  <div class="container p-4" style="overflow:auto">
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    date_default_timezone_set('Asia/Kolkata');
+  
+    <form method="POST" action="revokeLeave.php" id="revokeForm">
+    <!-- Wrap the button in a container for alignment -->
+<div class="d-flex justify-content-end mb-2">
+  <button type="submit" 
+          class="btn btn-danger d-flex align-items-center px-2 py-1"
+          onclick="return confirm('Are you sure you want to revoke selected requests?')"
+          title="Revoke Selected">
+  <i class="bi bi-arrow-counterclockwise text-white" 
+   style="font-size:1rem; font-weight: bold; "></i>
 
-                    $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
-                    $result7 = mysqli_query($connect, $sql7);
+   
+  </button>
+</div>
 
-                    if ($result7) {
-                      while ($row7 = mysqli_fetch_array($result7)) {
-                        $supervisorName = $row7['name'];
-                      }
 
-                      $sql = "SELECT leave_request.leave_type, leave_request.name, leave_request.reason, leave_request.from_date, leave_request.to_date, leave_request.sl_id, leave_request.approved_status,
-                    employee_details.supervisor, employee_details.name 
-            FROM leave_request 
-            INNER JOIN employee_details ON leave_request.name = employee_details.name 
-            WHERE leave_request.approved_status = 1
-            AND employee_details.supervisor='$supervisorName'";
 
-                      $resulta = $connect->query($sql);
+      <table class="table table-striped" id="dataTable1">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee Name</th>
+            <th>Leave Type</th>
+            <th>Duration</th>
+            <th>Reason</th>
+          
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          date_default_timezone_set('Asia/Kolkata');
 
-                      if ($resulta !== false) {
-                        $i = 1;
-                        $output = '';
+          $sql7 = "SELECT * FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+          $result7 = mysqli_query($connect, $sql7);
 
-                        while ($row = $resulta->fetch_array()) {
-                          $employeeName = $row['name'];
-                          $leaveType = $row['leave_type'];
-                          $reason = $row['reason'];
+          if ($result7) {
+            while ($row7 = mysqli_fetch_array($result7)) {
+              $supervisorName = $row7['name'];
+            }
 
-                          $datee = $row['to_date'] ? $row['from_date'] . ' to ' . $row['to_date'] : $row['from_date'];
+            $sql = "SELECT leave_request.leave_type, leave_request.name, leave_request.reason, 
+                           leave_request.from_date, leave_request.to_date, leave_request.sl_id, 
+                           leave_request.approved_status,
+                           employee_details.supervisor, employee_details.name 
+                    FROM leave_request 
+                    INNER JOIN employee_details 
+                      ON leave_request.name = employee_details.name 
+                    WHERE leave_request.approved_status = 1
+                      AND employee_details.supervisor='$supervisorName'";
 
-                          $output .= '<tr>                    
-                            <td>' . $i . '</td>
-                            <td>' . $employeeName . '</td>
-                            <td>' . $leaveType . ' </td>
-                            <td> Date : ' . $datee . ' </td>  
-                            <td>' . $reason . ' </td>                 
-                        </tr>';
-                          $i++;
-                        }
+            $resulta = $connect->query($sql);
 
-                        echo $output;
-                      } else {
-                        echo 'Error retrieving leave requests: ' . $connect->error;
-                      }
-                    } else {
-                      echo 'Error retrieving supervisor information: ' . $connect->error;
-                    }
-                    ?>
+            if ($resulta !== false) {
+              $i = 1;
+              $output = '';
 
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="profile-tab">
-            <div class="card">
-              <div class="container p-4" style="overflow:auto">
-                <table class="table table-striped" id="dataTable2">
-                  <thead>
-                    <tr class="">
-                      <th>
-                        #
-                      </th>
-                      <th>
-                        Employee Name
-                      </th>
-                      <th>
-                        Leave Type
-                      </th>
-                      <th>
-                        Duration
-                      </th>
-                      <th>
-                        Reason
-                      </th>
+              while ($row = $resulta->fetch_array()) {
+                $employeeName = $row['name'];
+                $leaveType    = $row['leave_type'];
+                $reason       = $row['reason'];
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    date_default_timezone_set('Asia/Kolkata');
+                $datee = $row['to_date'] 
+                        ? $row['from_date'] . ' to ' . $row['to_date'] 
+                        : $row['from_date'];
 
-                    // Fetch supervisor's name based on the session email
-                    $sqlSupervisor = "SELECT name FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
-                    $resultSupervisor = mysqli_query($connect, $sqlSupervisor);
+                $output .= '<tr>                    
+                  <td><input type="checkbox" name="revoke_ids[]" value="' . $row['sl_id'] . '"></td>
+  
+                   <td>' . htmlspecialchars($employeeName) . '</td>
+                   <td>' . htmlspecialchars($leaveType) . '</td>
+                   <td>Date: ' . htmlspecialchars($datee) . '</td>  
+                   <td>' . htmlspecialchars($reason) . '</td>
+                                </tr>';
+                $i++;
+              }
 
-                    if ($resultSupervisor) {
-                      $rowSupervisor = mysqli_fetch_assoc($resultSupervisor);
-                      $supervisorName = $rowSupervisor['name'];
-                    } else {
-                      // Handle the case where the supervisor's name couldn't be retrieved
-                      die("Error fetching supervisor's name: " . mysqli_error($connect));
-                    }
+              echo $output;
+            } else {
+              echo 'Error retrieving leave requests: ' . $connect->error;
+            }
+          } else {
+            echo 'Error retrieving supervisor information: ' . $connect->error;
+          }
+          ?>
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
 
-                    // Fetch rejected leave requests for the supervisor
-                    $sqlRejectedLeaves = "SELECT lr.leave_type, lr.name, lr.reason, lr.from_date, lr.to_date, lr.sl_id, lr.approved_status,
-                            ed.supervisor, ed.name AS employee_name
-                     FROM leave_request lr
-                     INNER JOIN employee_details ed ON lr.name = ed.name
-                     WHERE lr.approved_status = 2 AND ed.supervisor = '$supervisorName'";
+</div>
 
-                    $resultRejectedLeaves = $connect->query($sqlRejectedLeaves);
+      <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+  <div class="card">
+    <div class="container p-4" style="overflow:auto">
 
-                    if ($resultRejectedLeaves !== false) {
-                      $i = 1;
-                      $output = '';
+      <form method="POST" action="revokeLeave.php" id="revokeRejectedForm">
+        <!-- Revoke Button -->
+        <div class="d-flex justify-content-end mb-2">
+          <button type="submit" 
+                  class="btn btn-danger d-flex align-items-center px-2 py-1"
+                  onclick="return confirm('Are you sure you want to revoke selected rejected requests?')"
+                  title="Revoke Selected">
+            <i class="bi bi-arrow-counterclockwise text-white" 
+               style="font-size:1rem; font-weight:bold;"></i>
+          </button>
+        </div>
 
-                      while ($row = $resultRejectedLeaves->fetch_array()) {
-                        $employeeName = $row['employee_name'];
-                        $leave = $row['leave_type'];
-                        $reason = $row['reason'];
+        <table class="table table-striped" id="dataTable2">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Employee Name</th>
+              <th>Leave Type</th>
+              <th>Duration</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            date_default_timezone_set('Asia/Kolkata');
 
-                        if ($row['to_date']) {
-                          $datee = $row['from_date'] . ' to ' . $row['to_date'];
-                        } else {
-                          $datee = $row['from_date'];
-                        }
+            // Supervisor name from session
+            $sqlSupervisor = "SELECT name FROM employee_details WHERE email='" . $_SESSION['uname'] . "'";
+            $resultSupervisor = mysqli_query($connect, $sqlSupervisor);
 
-                        $output .= '<tr>                    
-                        <td>' . $i . '</td>
-                        <td>' . $employeeName . '</td>  
-                        <td>' . $leave . ' </td>
-                        <td> Date: ' . $datee . '</td>
-                        <td>' . $reason . '</td>
-                    </tr>';
+            if ($resultSupervisor) {
+              $rowSupervisor = mysqli_fetch_assoc($resultSupervisor);
+              $supervisorName = $rowSupervisor['name'];
+            } else {
+              die("Error fetching supervisor's name: " . mysqli_error($connect));
+            }
 
-                        $i++;
-                      }
+            // Get rejected leave requests
+            $sqlRejectedLeaves = "SELECT lr.leave_type, lr.name, lr.reason, 
+                                         lr.from_date, lr.to_date, lr.sl_id, lr.approved_status,
+                                         ed.supervisor, ed.name AS employee_name
+                                  FROM leave_request lr
+                                  INNER JOIN employee_details ed ON lr.name = ed.name
+                                  WHERE lr.approved_status = 2 
+                                  AND ed.supervisor = '$supervisorName'";
 
-                      echo $output;
-                    } else {
-                      // Handle the case where there is an error in the query
-                      die("Error fetching rejected leave requests: " . $connect->error);
-                    }
-                    ?>
+            $resultRejectedLeaves = $connect->query($sqlRejectedLeaves);
 
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+            if ($resultRejectedLeaves !== false) {
+              $i = 1;
+              while ($row = $resultRejectedLeaves->fetch_array()) {
+                $employeeName = $row['employee_name'];
+                $leave = $row['leave_type'];
+                $reason = $row['reason'];
+
+                $datee = $row['to_date'] ? $row['from_date'] . ' to ' . $row['to_date'] : $row['from_date'];
+
+                echo '<tr>
+                        <td><input type="checkbox" name="revoke_ids[]" value="' . $row['sl_id'] . '"></td>
+                        <td>' . htmlspecialchars($employeeName) . '</td>  
+                        <td>' . htmlspecialchars($leave) . '</td>
+                        <td>Date: ' . htmlspecialchars($datee) . '</td>
+                        <td>' . htmlspecialchars($reason) . '</td>
+                      </tr>';
+                $i++;
+              }
+            } else {
+              die("Error fetching rejected leave requests: " . $connect->error);
+            }
+            ?>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+
         </div>
       </div>
     </div>
