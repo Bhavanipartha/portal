@@ -21,7 +21,7 @@ $location = $_POST['location'];
 $currency = $_POST['currency'];
 
 // Check duplicate username
-$checkUser = "SELECT username FROM users WHERE username = '$user' LIMIT 1";
+$checkUser = "SELECT username FROM users WHERE username = '$user' AND status = 1 LIMIT 1";
 $result = mysqli_query($connect, $checkUser);
 
 if (mysqli_num_rows($result) > 0) {
@@ -29,6 +29,7 @@ if (mysqli_num_rows($result) > 0) {
     echo json_encode($response);
     exit;
 }
+
 
 // Insert employee details
 $sql = "INSERT INTO employee_details(

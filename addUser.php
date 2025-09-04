@@ -873,9 +873,9 @@ VALUES ('$date','$path', '$text')";
                       success: function(returndata) {
                         if (returndata.status === 'success') {
                           alert(returndata.message);
-                          window.location.href = 'manageUser.php'; // go only on success
+                          window.location.href = 'manageUser.php'; 
                         } else {
-                          alert(returndata.message); // show error but stay on same page
+                          alert(returndata.message); 
                         }
                       },
 
