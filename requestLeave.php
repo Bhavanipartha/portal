@@ -886,67 +886,60 @@ echo "<!-- DEBUG: role=" . $_SESSION['role'] . ", name=" . htmlspecialchars($nam
                 <script src="https://smtpjs.com/v3/smtp.js">
                 </script>
 
-                <script>
-                  (function() {
-                    const from = document.getElementById('frdate');
-                    const to = document.getElementById('todate');
+               <script>
+(function() {
+  const from = document.getElementById('frdate');
+  const to = document.getElementById('todate');
 
-                    function formatDateLocal(d) {
-                      const y = d.getFullYear();
-                      const m = String(d.getMonth() + 1).padStart(2, '0');
-                      const day = String(d.getDate()).padStart(2, '0');
-                      return `${y}-${m}-${day}`;
-                    }
+  function formatDateLocal(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
 
-                    function addDaysYYYYMMDD(yyyyMMdd, days) {
-                      const [y, m, d] = yyyyMMdd.split('-').map(Number);
-                      const dt = new Date(y, m - 1, d);
-                      dt.setDate(dt.getDate() + days);
-                      return formatDateLocal(dt);
-                    }
+  function validate() {
+    const fromVal = from.value;
+    const toVal = to.value;
 
-                    function validate() {
-                      const fromVal = from.value;
-                      const toVal = to.value;
+    to.setCustomValidity('');
 
-                      to.setCustomValidity('');
+    if (fromVal) {
+    
+      to.min = fromVal;
 
-                      if (fromVal) {
-                        const minAllowed = addDaysYYYYMMDD(fromVal, 1);
-                        to.min = minAllowed;
+      if (toVal && toVal < fromVal) {
+        to.setCustomValidity('Leave To cannot be before Leave From.');
+      }
+    } else {
+      to.removeAttribute('min');
+    }
+  }
 
-                        if (toVal && toVal <= fromVal) {
-                          to.setCustomValidity('Leave To must be later than Leave From.');
-                        }
-                      } else {
-                        to.removeAttribute('min');
-                      }
-                    }
+  
+  from.addEventListener('change', () => {
+    if (to.value && to.value < from.value) {
+      to.value = '';
+    }
+    validate();
+  });
 
-                    // Only validate after user interaction
-                    from.addEventListener('change', () => {
-                      if (to.value && to.value <= from.value) {
-                        to.value = '';
-                      }
-                      validate();
-                    });
+  to.addEventListener('change', validate);
+  to.addEventListener('input', validate);
 
-                    to.addEventListener('change', validate);
-                    to.addEventListener('input', validate);
+  const form = from.closest('form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      validate();
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        to.reportValidity();
+      }
+    });
+  }
+})();
+</script>
 
-                    // Validate only on submit
-                    const form = from.closest('form');
-                    if (form) {
-                      form.addEventListener('submit', (e) => {
-                        validate();
-                        if (!form.checkValidity()) {
-                          e.preventDefault();
-                          to.reportValidity();
-                        }
-                      });
-                    }
-                  })();
-                </script>
 
 
                 <script>
